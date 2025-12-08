@@ -1,0 +1,39 @@
+audio:
+  sample_rate: 24000
+  frame_size: 1024
+  hop_size: 256
+  channels_required: auto
+
+preproc:
+  rms_normalize: true
+  dae_model: complex_unet
+  dae_checkpoint: checkpoints/dae_unet.pt
+
+seld:
+  enabled_if_channels_gt: 1
+  model: conformer_seld
+  array_geometry: configs/array_geom.json
+  doa_output: regression
+
+sed:
+  model: conformer_sed
+  classes: [gunshot, explosion, speech, siren, car_engine, dog_bark, breaking_glass, alarm]
+  threshold: 0.5
+
+separation:
+  multi_channel:
+    method: mvdr_masknet
+    doa_conditioning: true
+  mono:
+    method: sepformer
+    pit: true
+
+enhancement:
+  speech: segan
+  transient: transient_restoration_net
+  harmonic: sinusoidal_enhancer
+
+output:
+  lufs_target: -23
+  true_peak_limit: -1.0
+  write_metadata: true
