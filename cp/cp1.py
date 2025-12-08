@@ -1,3 +1,5 @@
+from c.cl1 import EnvironmentalAudioPipeline
+
 def process_audio(input_wav_path, array_geometry=None, sample_rate=24000):
     audio, sr, C = load_audio(input_wav_path)           # shape: [T, C]
     audio = resample(audio, sr, sample_rate)
