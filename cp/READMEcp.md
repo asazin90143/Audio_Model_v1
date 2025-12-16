@@ -55,3 +55,95 @@ The system outputs:
 - **Separated Audio**: WAV files named by event type and timestamp.
 
 Example:
+- events.json ├── [ { "class": "Speech", "start": 1.2, "end": 4.5 } ] outputs/ ├── 0001_speech.wav ├── 0002_siren.wav
+
+
+---
+
+## ⚙️ Installation
+
+### Requirements
+- Python 3.9+
+- PyTorch / TensorFlow (depending on chosen models)
+- Librosa, NumPy, SciPy
+- Soundfile, PyTorch Lightning (recommended)
+
+### Setup
+```bash
+git clone https://github.com/your-repo/audio-pipeline.git
+cd audio-pipeline
+pip install -r requirements.txt
+
+
+### 🚀 Usage
+Run pipeline on an audio file
+python run_pipeline.py --input input.wav --output_dir outputs/
+
+
+Options
+- --array_geometry: JSON file with microphone positions (required for multi-channel).
+- --sample_rate: Target sample rate (default: 24000).
+- --model_config: Path to YAML config for model selection.
+
+📊 Evaluation Metrics
+- Denoising: SI-SDR, SI-SNR.
+- Localization: DOA error (degrees).
+- Classification: Event-based F1, segment-based F1.
+- Separation: SI-SDR, SDR, SIR, SAR.
+- Enhancement: PESQ, STOI, transient sharpness indices.
+
+🛠️ Project Structure
+audio-pipeline/
+├── configs/              # YAML configs for models
+├── checkpoints/          # Pretrained weights
+├── data/                 # Sample datasets
+├── modules/              # Core pipeline modules
+│   ├── preprocessing.py
+│   ├── localization.py
+│   ├── classification.py
+│   ├── separation.py
+│   └── enhancement.py
+├── run_pipeline.py       # Main entry point
+└── README.md
+
+
+
+📚 Training Data
+- Multi-channel: DCASE SELD datasets.
+- Mono: ESC-50, UrbanSound8K, LibriSpeech, DNS Challenge.
+- Synthetic mixtures: Augmented with impulse responses and noise.
+
+🤝 Contributing
+Contributions are welcome!
+- Fork the repo
+- Create a feature branch
+- Submit a pull request
+
+📜 License
+MIT License. See LICENSE file for details.
+
+🌟 Future Work
+- Real-time inference optimization.
+- Expanded taxonomy of environmental sounds.
+- Unified enhancement model for cross-class generalization.
+
+---
+
+Would you like me to also draft a **minimal repo skeleton with `run_pipeline.py` and configs** so you can drop this README in and have a working starter structure? That way, you’d have both documentation and code scaffolding ready to go.
+
+
+
+
+
+## to run
+
+# 1st
+
+# (optional) activate your venv if you use it
+# .\g\venv\Scripts\Activate.ps1
+
+# install CPU wheel
+# python -m pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+## Then rerun:
+# (python cp\cp1.py --input path\to\file.wav)

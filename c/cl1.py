@@ -140,12 +140,18 @@ class DenoisingAutoencoder(nn.Module):
         
         # Decoder with skip connections
         d3 = self.dec3(b)
+        if d3.shape[2:] != e3.shape[2:]:
+            d3 = F.interpolate(d3, size=e3.shape[2:], mode='bilinear', align_corners=False)
         d3 = torch.cat([d3, e3], dim=1)
         
         d2 = self.dec2(d3)
+        if d2.shape[2:] != e2.shape[2:]:
+            d2 = F.interpolate(d2, size=e2.shape[2:], mode='bilinear', align_corners=False)
         d2 = torch.cat([d2, e2], dim=1)
         
         d1 = self.dec1(d2)
+        if d1.shape[2:] != e1.shape[2:]:
+            d1 = F.interpolate(d1, size=e1.shape[2:], mode='bilinear', align_corners=False)
         d1 = torch.cat([d1, e1], dim=1)
         
         # Output mask
@@ -290,9 +296,8 @@ class SELDNet(nn.Module):
         B, C, F, T = x.shape
         features = self.cnn(x)  # [B, 256, F', T']
         
-        # Reshape for RNN: [B, T', 256*F']
-        _, C_out, F_out, T_out = features.shape
-        features = features.permute(0, 3, 1, 2).reshape(B, T_out, -1)
+        # Collapse frequency dimension and permute for RNN: [B, T', 256]
+        features = torch.mean(features, dim=2).permute(0, 2, 1)
         
         # Temporal modeling
         rnn_out, _ = self.gru(features)  # [B, T', 256]
@@ -469,9 +474,8 @@ class CRNN_Classifier(nn.Module):
         B, _, F, T = x.shape
         features = self.conv(x)  # [B, 256, F', T']
         
-        # Reshape for RNN
-        _, C, F_out, T_out = features.shape
-        features = features.permute(0, 3, 1, 2).reshape(B, T_out, -1)
+        # Collapse frequency dimension and permute for RNN: [B, T', 256]
+        features = torch.mean(features, dim=2).permute(0, 2, 1)
         
         # RNN
         rnn_out, _ = self.gru(features)
@@ -629,7 +633,7 @@ class TemporalConvNet(nn.Module):
         self.blocks = nn.ModuleList([
             TemporalBlock(N, B, H, P, 2**x) for x in range(X) for _ in range(R)
         ])
-        self.output = nn.Conv1d(B, N, kernel_size=1)
+        self.output = nn.Conv1d(N, N, kernel_size=1)
         self.activation = nn.ReLU()
     
     def forward(self, x):
