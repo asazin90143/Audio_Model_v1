@@ -182,10 +182,33 @@ pathlib>=1.0.1
 
 ## 🚀 Quick Start
 
-### Basic Usage
+### 🧪 Testing the Model
+
+You can immediately test the pipeline using the built-in synthetic audio generator included in the core script. This requires no input files.
+
+```bash
+# Run the synthetic test (creates test_audio.wav and processes it)
+python c/cl1.py
+```
+
+This will:
+1.  Create a `test_audio.wav` containing overlapping speech and siren.
+2.  Run the full 5-stage pipeline.
+3.  Save the results in `./pipeline_output`.
+4.  Print a summary of detected events to the console.
+
+### Running on Your Own Files
+
+Use the provided convenience wrapper in `cp/cp1.py`:
+
+```bash
+python cp/cp1.py --input path/to/your/audio.wav --outdir ./my_output
+```
+
+### Basic Usage (Python)
 
 ```python
-from pipeline import EnvironmentalAudioPipeline
+from c.cl1 import EnvironmentalAudioPipeline
 
 # Initialize pipeline
 pipeline = EnvironmentalAudioPipeline(device='cuda')  # or 'cpu'
@@ -195,24 +218,6 @@ results = pipeline.process(
     audio_path='input.wav',
     output_dir='./output'
 )
-
-# View results
-print(f"Detected {len(results['events'])} events")
-for event in results['events']:
-    print(f"{event.label}: {event.start_time:.2f}s - {event.end_time:.2f}s")
-```
-
-### Command Line Interface
-
-```bash
-# Process single file
-python pipeline.py --input audio.wav --output ./results
-
-# Process with GPU
-python pipeline.py --input audio.wav --device cuda
-
-# Batch processing
-python pipeline.py --input_dir ./audio_files --output_dir ./results
 ```
 
 ---
