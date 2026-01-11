@@ -12,7 +12,7 @@ This repository contains an end-to-end deep learning pipeline for environmental 
 - Generates separated and enhanced audio files plus a JSON report
 
 ## Directory Structure
-- `audio_pipeline/main.py`: Main pipeline implementation
+- `cg/cg1.py`: Main pipeline implementation (Standalone Prototype)
 - `out/`: Default output directory containing extracted sources, enhanced files, and the final report
 
 ## Installation
@@ -20,9 +20,18 @@ This repository contains an end-to-end deep learning pipeline for environmental 
 pip install numpy scipy soundfile librosa torch torchaudio
 ```
 
-## Usage
+## 🚀 Usage & Testing
+
+### 🧪 Test Run
+To run the prototype on an input file:
+
 ```bash
-python audio_pipeline/main.py --input input.wav --outdir out/
+python cg/cg1.py --input path/to/your/input.wav --outdir out/
+```
+
+### Command Line Arguments
+```bash
+python cg/cg1.py --input input.wav --outdir out/ --device cuda
 ```
 
 ### Optional Arguments
