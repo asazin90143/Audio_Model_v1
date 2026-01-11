@@ -4,8 +4,12 @@ This script exposes a single helper that runs the full pipeline on an input
 audio file and writes results to the requested output directory.
 """
 
+import sys
 from pathlib import Path
 from typing import Optional
+# Add project root to path to allow importing 'c' module
+sys.path.append(str(Path(__file__).parent.parent))
+
 import argparse
 import torch
 
@@ -35,7 +39,7 @@ def _cli():
     )
     parser.add_argument("--input", "-i", required=True, help="Path to input WAV file.")
     parser.add_argument(
-        "--outdir", "-o", default="./output", help="Directory to store pipeline outputs."
+        "--outdir", "-o", default="./outputs/c", help="Directory to store pipeline outputs."
     )
     parser.add_argument(
         "--device",

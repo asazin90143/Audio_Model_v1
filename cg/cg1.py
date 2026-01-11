@@ -468,7 +468,7 @@ def run_pipeline(input_path: str, outdir: str, model_dir: Optional[str]=None, de
 def main():
     parser = argparse.ArgumentParser(description="Audio E2E pipeline: denoise -> localize -> detect -> separate -> enhance")
     parser.add_argument("--input", "-i", required=True, help="Input WAV file (mono or multichannel)")
-    parser.add_argument("--outdir", "-o", default="out", help="Output directory")
+    parser.add_argument("--outdir", "-o", default="outputs/cg", help="Output directory")
     parser.add_argument("--model-dir", "-m", default=None, help="Directory with model checkpoints (optional)")
     parser.add_argument("--device", default="cpu", help="torch device (cpu or cuda)")
     args = parser.parse_args()

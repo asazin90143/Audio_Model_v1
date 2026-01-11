@@ -201,9 +201,20 @@ class EnvironmentalAudioSystem(nn.Module):
         return final_outputs
 
 # --- Usage Example ---
+# --- Usage Example ---
 if __name__ == "__main__":
+    import os
+    from pathlib import Path
+
     # Initialize system
     system = EnvironmentalAudioSystem()
+    print("[INFO] Model G System Initialized Successfully.")
+    
+    # Create default output directory
+    output_dir = Path("./outputs/g")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    print(f"[INFO] Default output directory ready: {output_dir.resolve()}")
     
     # Simulate processing (Replace with real path)
+    # output = system.process_file("environmental_recording.wav")
     # output = system.process_file("environmental_recording.wav")

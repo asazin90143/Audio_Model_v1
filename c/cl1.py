@@ -12,6 +12,7 @@ from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 from pathlib import Path
 import warnings
+import soundfile as sf
 warnings.filterwarnings('ignore')
 
 
@@ -212,6 +213,7 @@ class AdaptivePreprocessor:
                 
                 # Reconstruct
                 spec_denoised = mag_denoised * torch.exp(1j * phase)
+                spec_denoised = spec_denoised.squeeze(0).squeeze(0)
                 
                 # iSTFT
                 audio_denoised = torch.istft(
@@ -983,13 +985,13 @@ class EnvironmentalAudioPipeline:
         self.device = device
         
         # Initialize all stages
-        print("🔧 Initializing pipeline stages...")
+        print("[INFO] Initializing pipeline stages...")
         self.stage1 = AdaptivePreprocessor(device)
         self.stage2 = AudioSourceLocalizer(device)
         self.stage3 = AudioEventClassifier(device)
         self.stage4 = AdaptiveSourceSeparator(device)
         self.stage5 = ClassSpecificEnhancer(device)
-        print("✅ Pipeline ready!\n")
+        print("[INFO] Pipeline ready!\n")
     
     def process(self, audio_path: str, output_dir: str = './output') -> Dict:
         """
@@ -1002,32 +1004,39 @@ class EnvironmentalAudioPipeline:
         Returns:
             Dictionary with results
         """
-        print(f"🎵 Processing: {audio_path}")
+        print(f"[INFO] Processing: {audio_path}")
         output_path = Path(output_dir)
         output_path.mkdir(exist_ok=True)
         
         # Load audio
-        audio, sr = torchaudio.load(audio_path)
+        # audio, sr = torchaudio.load(audio_path)
+        data, sr = sf.read(audio_path)
+        # Ensure it's (C, T)
+        if data.ndim == 1:
+            data = data[np.newaxis, :]
+        else:
+            data = data.T
+        audio = torch.from_numpy(data).float()
         print(f"   Loaded: {audio.shape[0]} channels, {sr} Hz, {audio.shape[1]/sr:.2f}s duration")
         
         # ====== STAGE 1: Adaptive Pre-processing ======
-        print("\n⚙️  STAGE 1: Denoising...")
+        print("\n[STAGE 1] Denoising...")
         denoised, C = self.stage1.process(audio, sr)
-        print(f"   ✓ Denoised {C} channel(s)")
+        print(f"   [OK] Denoised {C} channel(s)")
         
         # ====== STAGE 2: Source Localization (if multi-channel) ======
         spatial_events = []
         if C > 1:
-            print("\n📍 STAGE 2: Source Localization...")
+            print("\n[STAGE 2] Source Localization...")
             spatial_events = self.stage2.process(denoised, sr)
-            print(f"   ✓ Localized {len(spatial_events)} sources")
+            print(f"   [OK] Localized {len(spatial_events)} sources")
             for evt in spatial_events:
-                print(f"     • {evt.label}: Az={evt.azimuth:.1f}°, El={evt.elevation:.1f}°")
+                print(f"     - {evt.label}: Az={evt.azimuth:.1f}deg, El={evt.elevation:.1f}deg")
         else:
-            print("\n📍 STAGE 2: Skipped (mono input)")
+            print("\n[STAGE 2] Skipped (mono input)")
         
         # ====== STAGE 3: Event Classification ======
-        print("\n🏷️  STAGE 3: Event Classification...")
+        print("\n[STAGE 3] Event Classification...")
         classified_events = self.stage3.process(denoised, sr)
         
         # Merge spatial info if available
@@ -1037,18 +1046,18 @@ class EnvironmentalAudioPipeline:
                     evt.azimuth = spatial_events[i].azimuth
                     evt.elevation = spatial_events[i].elevation
         
-        print(f"   ✓ Detected {len(classified_events)} events:")
+        print(f"   [OK] Detected {len(classified_events)} events:")
         for evt in classified_events:
-            spatial_info = f" @ ({evt.azimuth:.0f}°, {evt.elevation:.0f}°)" if evt.azimuth else ""
-            print(f"     • {evt.label}: {evt.start_time:.2f}s - {evt.end_time:.2f}s{spatial_info}")
+            spatial_info = f" @ ({evt.azimuth:.0f}deg, {evt.elevation:.0f}deg)" if evt.azimuth else ""
+            print(f"     - {evt.label}: {evt.start_time:.2f}s - {evt.end_time:.2f}s{spatial_info}")
         
         # ====== STAGE 4: Source Separation ======
-        print("\n🔗 STAGE 4: Source Separation...")
+        print("\n[STAGE 4] Source Separation...")
         separated_waveforms = self.stage4.process(denoised, classified_events, C > 1)
-        print(f"   ✓ Separated {len(separated_waveforms)} sources")
+        print(f"   [OK] Separated {len(separated_waveforms)} sources")
         
         # ====== STAGE 5: Enhancement ======
-        print("\n✨ STAGE 5: Class-Specific Enhancement...")
+        print("\n[STAGE 5] Class-Specific Enhancement...")
         separated_sources = []
         
         for i, (waveform, event) in enumerate(zip(separated_waveforms, classified_events)):
@@ -1057,7 +1066,8 @@ class EnvironmentalAudioPipeline:
             # Save enhanced audio
             filename = f"source_{i+1}_{event.label}_{event.start_time:.1f}s.wav"
             filepath = output_path / filename
-            torchaudio.save(str(filepath), enhanced.unsqueeze(0), sr)
+            # torchaudio.save(str(filepath), enhanced.unsqueeze(0), sr)
+            sf.write(str(filepath), enhanced.detach().cpu().numpy(), sr)
             
             separated_sources.append(SeparatedSource(
                 waveform=enhanced,
@@ -1066,7 +1076,7 @@ class EnvironmentalAudioPipeline:
                 enhanced=True
             ))
             
-            print(f"   ✓ Enhanced {event.label} → {filename}")
+            print(f"   [OK] Enhanced {event.label} -> {filename}")
         
         # Compile results
         results = {
@@ -1078,7 +1088,7 @@ class EnvironmentalAudioPipeline:
             'output_directory': str(output_path)
         }
         
-        print(f"\n🎉 Processing complete! Output saved to: {output_path}")
+        print(f"\n[INFO] Processing complete! Output saved to: {output_path}")
         return results
 
 
@@ -1109,11 +1119,13 @@ def main():
     audio = (speech + siren).unsqueeze(0)  # [1, T] mono
     
     # Save test file
+    # Save test file
     test_path = './test_audio.wav'
-    torchaudio.save(test_path, audio, sr)
+    # torchaudio.save(test_path, audio, sr)
+    sf.write(test_path, audio.squeeze(0).numpy(), sr)
     
     # Process
-    results = pipeline.process(test_path, output_dir='./pipeline_output')
+    results = pipeline.process(test_path, output_dir='./outputs/c')
     
     # Display summary
     print("\n" + "="*60)
@@ -1124,7 +1136,7 @@ def main():
     print(f"Sample Rate: {results['sample_rate']} Hz")
     print(f"\nDetected Events: {len(results['events'])}")
     for evt in results['events']:
-        print(f"  • {evt.label}: {evt.start_time:.2f}s - {evt.end_time:.2f}s")
+        print(f"  - {evt.label}: {evt.start_time:.2f}s - {evt.end_time:.2f}s")
     print(f"\nSeparated & Enhanced Sources: {len(results['separated_sources'])}")
     print(f"Output Directory: {results['output_directory']}")
     print("="*60)
