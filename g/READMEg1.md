@@ -99,15 +99,23 @@ pip install -r requirements.txt
 
 ## 💻 Usage
 
+### 🧪 Testing
+This implementation is designed as a modular framework. You can run the file directly to verify the architecture initialization:
+
+```bash
+python g/g1.py
+```
+*Note: The default `__main__` block initializes the system but does not process a file by default to avoid errors. You can modify the bottom of `g/g1.py` to point to a real wav file.*
+
 ### Python API
 
-You can import the core system into your own Python scripts to process audio files programmatically.
+You can import the core system into your own Python scripts:
 
 ```python
 import torchaudio
-from modules.pipeline import EnvironmentalAudioSystem
+from g.g1 import EnvironmentalAudioSystem
 
-# 1. Initialize the system (loads default pre-trained models)
+# 1. Initialize the system
 system = EnvironmentalAudioSystem()
 
 # 2. Process an audio file
@@ -122,25 +130,8 @@ for i, (label, waveform) in enumerate(results):
     print(f"Saved: {output_filename}")
 ```
 
-### 🖥️ CLI Usage (Optional)
-
-You can also run the pipeline directly from the command line using the `main.py` entry point.
-
-**Basic Command:**
-
-```bash
-python main.py --input "data/recording_001.wav" --output_dir "results/"
-```
-
-**Advanced Arguments:**
-
-```bash
-python main.py \
-  --input "data/recording_001.wav" \
-  --output_dir "results/" \
-  --threshold 0.5 \
-  --save_spectrograms
-```
+### 🖥️ CLI Usage
+Currently, this module is set up as a framework. To run it as a CLI, you would need to implement an `argparse` wrapper similar to the one in `c/cl1.py` or `cp/cp1.py`.
 
 **Arguments:**
 - `--input`: Path to the input `.wav` file.
