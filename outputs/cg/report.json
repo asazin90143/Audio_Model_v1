@@ -1,0 +1,108 @@
+{
+  "input": "test_audio.wav",
+  "channels": 1,
+  "events": [
+    {
+      "label": "Explosion",
+      "start": 0.0,
+      "end": 2.944,
+      "score": 0.7164213061332703
+    },
+    {
+      "label": "Speech",
+      "start": 0.0,
+      "end": 0.928,
+      "score": 0.5881718993186951
+    },
+    {
+      "label": "Dog",
+      "start": 0.096,
+      "end": 1.056,
+      "score": 0.5493633151054382
+    },
+    {
+      "label": "Speech",
+      "start": 0.992,
+      "end": 1.056,
+      "score": 0.5025693774223328
+    },
+    {
+      "label": "Dog",
+      "start": 1.504,
+      "end": 1.6,
+      "score": 0.5538269877433777
+    },
+    {
+      "label": "Speech",
+      "start": 1.632,
+      "end": 1.824,
+      "score": 0.5332653522491455
+    },
+    {
+      "label": "Dog",
+      "start": 1.824,
+      "end": 1.92,
+      "score": 0.5141414999961853
+    },
+    {
+      "label": "Speech",
+      "start": 1.984,
+      "end": 2.048,
+      "score": 0.5294101238250732
+    },
+    {
+      "label": "Dog",
+      "start": 2.336,
+      "end": 2.4,
+      "score": 0.535429835319519
+    },
+    {
+      "label": "Speech",
+      "start": 2.368,
+      "end": 2.432,
+      "score": 0.5092107057571411
+    },
+    {
+      "label": "Speech",
+      "start": 2.56,
+      "end": 2.912,
+      "score": 0.5301554203033447
+    },
+    {
+      "label": "Dog",
+      "start": 2.592,
+      "end": 2.88,
+      "score": 0.5341605544090271
+    }
+  ],
+  "separated": [
+    {
+      "path": "outputs\\cg\\enh_sep_mono_0.wav",
+      "class": "Explosion",
+      "orig_sep": {
+        "path": "outputs\\cg\\sep_mono_0.wav",
+        "source_hint": "mono_mask",
+        "index": 0
+      }
+    },
+    {
+      "path": "outputs\\cg\\enh_sep_mono_1.wav",
+      "class": "Explosion",
+      "orig_sep": {
+        "path": "outputs\\cg\\sep_mono_1.wav",
+        "source_hint": "mono_mask",
+        "index": 1
+      }
+    },
+    {
+      "path": "outputs\\cg\\enh_sep_mono_2.wav",
+      "class": "Explosion",
+      "orig_sep": {
+        "path": "outputs\\cg\\sep_mono_2.wav",
+        "source_hint": "mono_mask",
+        "index": 2
+      }
+    }
+  ],
+  "doa_frames": []
+}
