@@ -1,7 +1,7 @@
 # 🎧 Audio_Model_v1: Environmental Audio Analysis Project
 
 Welcome to the **Audio_Model_v1** project! This repository hosts three distinct implementations of an end-to-end deep learning pipeline for environmental audio analysis. The system is designed to perform:
-1.  **Denoising**
+1.  **Deno  ising**
 2.  **Source Localization** (Multi-channel)
 3.  **Event Classification**
 4.  **Source Separation**
